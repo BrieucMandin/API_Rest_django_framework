@@ -24,6 +24,23 @@ from rest_framework.decorators import action
 #         queryset = Product.objects.all()
 #         serializer = ProductSerializer(queryset, many=True)
 #         return Response(serializer.data)
+
+class MultipleSerializerMixin:
+
+    detail_serializer_class = None
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve' and self.detail_serializer_class is not None:
+            return self.detail_serializer_class
+        return super().get_serializer_class()
+
+class AdminCategoryViewset(MultipleSerializerMixin, ModelViewSet):
+ 
+    serializer_class = CategoryListSerializer
+    detail_serializer_class = CategoryDetailSerializer
+ 
+    def get_queryset(self):
+        return Category.objects.all()
     
 class CategoryViewset(ReadOnlyModelViewSet):
 
@@ -118,6 +135,13 @@ class ProductViewset(ReadOnlyModelViewSet):
                 return Product.objects.all()
             return queryset
     
+
+
+class AdminArticleViewset(ModelViewSet):
+    serializer_class = ArticleSerializer
+
+    def get_queryset(self):
+        return Article.objects.all()
 
 class ArticleViewset(ModelViewSet):
     
