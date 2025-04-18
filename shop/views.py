@@ -10,6 +10,11 @@ from rest_framework.viewsets import ReadOnlyModelViewSet
 from django.db import transaction
 from rest_framework.decorators import action
 
+
+from shop.permissions import IsAdminAuthenticated
+ 
+from rest_framework.permissions import IsAuthenticated
+
 # class CategoryView(APIView):
 
 #     def get(self, *args, **kwargs):
@@ -25,6 +30,9 @@ from rest_framework.decorators import action
 #         serializer = ProductSerializer(queryset, many=True)
 #         return Response(serializer.data)
 
+
+ 
+
 class MultipleSerializerMixin:
 
     detail_serializer_class = None
@@ -33,11 +41,14 @@ class MultipleSerializerMixin:
         if self.action == 'retrieve' and self.detail_serializer_class is not None:
             return self.detail_serializer_class
         return super().get_serializer_class()
+    
+
 
 class AdminCategoryViewset(MultipleSerializerMixin, ModelViewSet):
  
     serializer_class = CategoryListSerializer
     detail_serializer_class = CategoryDetailSerializer
+    permission_classes = [IsAdminAuthenticated]
  
     def get_queryset(self):
         return Category.objects.all()
